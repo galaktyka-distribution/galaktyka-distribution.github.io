@@ -1707,7 +1707,7 @@ body.ovonly .pickers label.f{display:none!important}body.ovonly #online{display:
 (function(){
 const SB_URL='https://irxbangkamqqizzsoedq.supabase.co',SB_KEY='sb_publishable_Cit-77jQAuDz3HxPUhqn_Q_qUG1TFZI';
 const MAIL_DOMAIN='galaktyka-distribution.github.io';
-const LOGIN_MAIL={'віталій':'vitaliy','наталі':'natali','вадим':'vadym'};
+const LOGIN_MAIL={'віталій':'vitaliy','наталі':'natali','v.bilichenko':'vadym'};
 const sb=window.supabase.createClient(SB_URL,SB_KEY,{auth:{persistSession:true,autoRefreshToken:true,storageKey:'bf_sb_auth'}});
 const ME={uid:null,login:null,name:null,role:null};
 const PEER=Math.random().toString(36).slice(2,10);
@@ -1889,7 +1889,7 @@ function queueSave(id){try{nvSave(0)}catch(e){}clearTimeout(pending[id]);pending
 function save(id){clearTimeout(pending[id]);delete pending[id];if(/_\d{4}-13_/.test(id)||(S.docs[id]&&S.docs[id]._y))return Promise.resolve();if(!S.db){toast('Сховище недоступне — зміни не збережено');return Promise.resolve()}
   const d=JSON.parse(JSON.stringify(Object.assign({},S.docs[id],{updatedAt:new Date().toISOString(),updatedBy:S.uid||null})));
   chains[id]=(chains[id]||Promise.resolve()).then(()=>S.db.collection('sub').doc(id).set(d)).then(()=>{try{nvSave(1)}catch(x){}}).catch(e=>{try{nvSave(-1)}catch(x){}toast(e&&e.code==='invalid_argument'?(S.canWrite===false?'Доступ лише на перегляд — попросіть власника дати рівень «Учасник» у меню «Поділитися»':'Не вдалося зберегти: '+(e.message||'дані відхилено')):'Не вдалося зберегти: '+(e&&e.message||'помилка'))});return chains[id]}
-function editable(sec){if(isY(S.month))return false;if(sec==='sales'&&S.scen==='fact')return false;const d=getDoc(sec);const st=d?d.status:'draft';if(st==='approved')return false;if(st==='submitted')return S.admin;return true}
+function editable(sec){if(S.canWrite===false)return false;if(isY(S.month))return false;if(sec==='sales'&&S.scen==='fact')return false;const d=getDoc(sec);const st=d?d.status:'draft';if(st==='approved')return false;if(st==='submitted')return S.admin;return true}
 function salesBase(b=S.branch,m=S.month){let x=m;for(let i=0;i<6;i++){x=prevMonth(x);const d=getDoc('sales','fact',b,x);if(d&&d.values&&Object.keys(d.values).length)return x}return null}
 function refBadge(el,k,bid,base){const f=val('sales',k+':'+bid,'fact',base),pl=val('sales',k+':'+bid,'plan');const td=el.parentElement;
   const mn=monthName(base,'nom')+' '+String(base).slice(0,4);const pc=k==='m_pct';const F=x=>pc?fmt(x,1)+'%':fmt(x);
@@ -1941,7 +1941,7 @@ function people(){const m=new Map();PEERS.filter(p=>p.kind!=='agent').forEach(p=
 function av(p,cls){const n=pname(p);return `<span class="pav ${cls||''}${p.isMe?' me':''}" style="--h:${hue(pid(p))}">${esc(initials(n))}</span>`}
 
 // ---------- Вхід за логіном і паролем (зручний «замок», не захист рівня сервера) ----------
-const USERS={'віталій':{name:'Віталій',owner:true},'наталі':{name:'Наталі'},'вадим':{name:'Вадим',role:'overview'}};
+const USERS={'віталій':{name:'Віталій',owner:true},'наталі':{name:'Наталі'},'v.bilichenko':{name:'Вадим Біліченко'}};
 function sha256js(str){const K=[],H=[];let n=2,c=0;const fr=x=>(x-(x|0))*4294967296|0;while(c<64){let p=1;for(let i=2;i*i<=n;i++)if(n%i===0){p=0;break}if(p){if(c<8)H[c]=fr(Math.pow(n,1/2));K[c++]=fr(Math.cbrt(n))}n++}
   const by=[...new TextEncoder().encode(str)],l=by.length*8;by.push(0x80);while(by.length%64!==56)by.push(0);for(let i=7;i>=0;i--)by.push(i>3?0:(l>>>(i*8))&255);
   const r=(x,k)=>(x>>>k)|(x<<(32-k));for(let o=0;o<by.length;o+=64){const w=[];for(let i=0;i<16;i++)w[i]=(by[o+i*4]<<24)|(by[o+i*4+1]<<16)|(by[o+i*4+2]<<8)|by[o+i*4+3];
@@ -2699,7 +2699,7 @@ async function aiDialog(view){document.querySelectorAll('.mdl').forEach(x=>x.rem
         await enqueue()},{cellStyles:true});
       f.append(g,cm,pick);bx.append(f)}
     // черга
-    const own=S.owner;const qn=aiI().filter(x=>x.status==='queued'||x.status==='error');
+    const own=S.owner&&!!S.sample;const qn=aiI().filter(x=>x.status==='queued'||x.status==='error');
     const hd=document.createElement('div');hd.className='aih';hd.innerHTML=`<b>Черга</b><span class="hint">${aiI().filter(q=>q.status!=='applied').length?aiI().filter(q=>q.status!=='applied').length+' файл(ів)':''}</span>`;
     if(own&&qn.length){const run=document.createElement('button');run.type='button';run.className='btn pri';run.textContent=`Розібрати чергу (${qn.length})`;run.title='Розбір іде через ваш ліміт Claude';run.onclick=()=>runAll(qn,run);hd.append(run)}
     const rf=document.createElement('button');rf.type='button';rf.className='btn';rf.textContent='Оновити';rf.onclick=async()=>{rf.disabled=true;await aiLoad();draw()};hd.append(rf);bx.append(hd);
@@ -2907,7 +2907,7 @@ async function axDialog(){document.querySelectorAll('.mdl').forEach(x=>x.remove(
         try{await withTO(S.db.collection('aiq').doc(id).set(d),20000);const q=Object.assign({id},d);AIQ.list.unshift(q);
           if(S.owner&&S.sample){go.textContent='AI складає таблицю…';try{await axProcess(q);toast('Готово — можна скачати')}catch(e){toast(q.err||'Не вдалося')}}else toast('Запит у черзі')}catch(e){toast('Не вдалося: '+errTxt(e))}draw()};
       f.append(ta,ex,go);bx.append(f)}
-    const own=S.owner;const qn=aiE().filter(x=>x.status==='queued'||x.status==='error');const hd=document.createElement('div');hd.className='aih';hd.innerHTML=`<b>Запити</b><span class="hint"></span>`;
+    const own=S.owner&&!!S.sample;const qn=aiE().filter(x=>x.status==='queued'||x.status==='error');const hd=document.createElement('div');hd.className='aih';hd.innerHTML=`<b>Запити</b><span class="hint"></span>`;
     if(own&&qn.length){const run=document.createElement('button');run.type='button';run.className='btn pri';run.textContent=`Обробити чергу (${qn.length})`;run.onclick=()=>runAll(qn,run);hd.append(run)}
     const rf=document.createElement('button');rf.type='button';rf.className='btn';rf.textContent='Оновити';rf.onclick=async()=>{rf.disabled=true;await aiLoad();draw()};hd.append(rf);bx.append(hd);
     const tl=document.createElement('div');tl.className='ail';const L=aiE();if(!L.length)tl.innerHTML='<div class="hint" style="padding:10px 0">Запитів ще немає.</div>';
@@ -3017,7 +3017,7 @@ async function arDialog(){document.querySelectorAll('.mdl').forEach(x=>x.remove(
         try{for(let i=0;i<parts.length;i++){const id='r_'+Date.now().toString(36)+'_'+Math.random().toString(36).slice(2,6);const d={kind:'refs',file:file+(parts.length>1?` (частина ${i+1} з ${parts.length})`:''),at:new Date().toISOString(),by:S.uid||null,status:'queued',hint:{month:sm.value||null},note:cm.value.trim()||null,text:parts[i],size:parts[i].length};
           await withTO(S.db.collection('aiq').doc(id).set(d),20000);const q=Object.assign({id},d);AIQ.list.unshift(q);if(S.owner&&S.sample){pick.textContent='AI порівнює з довідниками…';try{await arProcess(q)}catch(e){}}}toast(S.owner&&S.sample?'Готово — перевірте зміни':'Файл у черзі')}catch(e){toast('Не вдалося: '+errTxt(e))}draw()});
       f.append(g,cm,pick);bx.append(f)}
-    const own=S.owner;const qn=aiR().filter(x=>x.status==='queued'||x.status==='error');const hd=document.createElement('div');hd.className='aih';hd.innerHTML=`<b>Черга</b><span class="hint"></span>`;
+    const own=S.owner&&!!S.sample;const qn=aiR().filter(x=>x.status==='queued'||x.status==='error');const hd=document.createElement('div');hd.className='aih';hd.innerHTML=`<b>Черга</b><span class="hint"></span>`;
     if(own&&qn.length){const run=document.createElement('button');run.type='button';run.className='btn pri';run.textContent=`Розібрати чергу (${qn.length})`;run.onclick=()=>runAll(qn,run);hd.append(run)}
     const rf=document.createElement('button');rf.type='button';rf.className='btn';rf.textContent='Оновити';rf.onclick=async()=>{rf.disabled=true;await aiLoad();draw()};hd.append(rf);bx.append(hd);
     const tl=document.createElement('div');tl.className='ail';const L0=aiR();if(!L0.length)tl.innerHTML='<div class="hint" style="padding:10px 0">Черга порожня.</div>';
@@ -3125,7 +3125,7 @@ async function crDialog(){document.querySelectorAll('.mdl').forEach(x=>x.remove(
         try{const id='c_'+Date.now().toString(36)+'_'+Math.random().toString(36).slice(2,6);const d={kind:'change',req:t,file:t.slice(0,90),at:new Date().toISOString(),by:S.uid||null,status:'queued',hint:{month:sm.value||null}};await withTO(S.db.collection('aiq').doc(id).set(d),20000);const q=Object.assign({id},d);AIQ.list.unshift(q);
           if(S.owner&&S.sample){go.textContent='AI шукає, що змінити…';try{await crProcess(q);draw();review(q);return}catch(e){}}toast(S.owner&&S.sample?'Не вдалося розібрати — спробуйте «Розібрати»':'Запит у черзі')}catch(e){toast('Не вдалося: '+errTxt(e))}draw()};
       f.append(cm,g,go);bx.append(f)}
-    const own=S.owner;const qn=aiC().filter(x=>x.status==='queued'||x.status==='error');const hd=document.createElement('div');hd.className='aih';hd.innerHTML=`<b>Запити</b><span class="hint"></span>`;
+    const own=S.owner&&!!S.sample;const qn=aiC().filter(x=>x.status==='queued'||x.status==='error');const hd=document.createElement('div');hd.className='aih';hd.innerHTML=`<b>Запити</b><span class="hint"></span>`;
     if(own&&qn.length){const run=document.createElement('button');run.type='button';run.className='btn pri';run.textContent=`Розібрати чергу (${qn.length})`;run.onclick=()=>runAll(qn,run);hd.append(run)}
     const rf=document.createElement('button');rf.type='button';rf.className='btn';rf.textContent='Оновити';rf.onclick=async()=>{rf.disabled=true;await aiLoad();draw()};hd.append(rf);bx.append(hd);
     const L0=aiC();const act0=L0.filter(q=>q.status!=='applied'),fin=L0.filter(q=>q.status==='applied');
@@ -5349,7 +5349,7 @@ try{matchMedia('(max-width:760px)').addEventListener('change',placeSvc)}catch(e)
     b.onclick=()=>{if(!b.dataset.sure){b.dataset.sure=1;b.classList.add('sure');b.querySelector('.lgn').textContent='Точно вийти?';setTimeout(()=>{delete b.dataset.sure;b.classList.remove('sure');b.querySelector('.lgn').textContent='Вийти'},3000);return}logout()};sw.after(b)}}}catch(e){}placeSvc();
   const [db,user,dl]=await Promise.all([claude.use('db'),claude.use('user'),claude.use('downloads')]);S.db=db;S.user=user;S.dl=dl;claude.use('sample').then(x=>{S.sample=x}).catch(()=>{});if(db){aiLoad().then(()=>{if(S.tab==='ai')render()});setTimeout(aiWatch,1500)}
   if(user){try{S.admin=await user.canEdit();S.uid=await user.id();try{S.owner=user.isOwner?!!(await user.isOwner()):false}catch(e){}}catch(e){}}
-  if(user&&user.can){try{const cw=await user.can('data.write');S.canWrite=cw;if(cw===false){const d=document.createElement('div');d.className='rowarn';d.innerHTML='<b>У вас доступ лише на перегляд.</b> Вносити й змінювати дані не вийде. Попросіть власника сторінки в меню «Поділитися» дати вам рівень доступу не нижче «Учасник» (Contributor).';const v=$('view');if(v&&v.parentNode)v.parentNode.insertBefore(d,v)}}catch(e){}}
+  if(user&&user.can){try{const cw=await user.can('data.write');S.canWrite=cw;if(cw===false){const d=document.createElement('div');d.className='rowarn';d.innerHTML='<b>У вас доступ лише на перегляд.</b> Ви бачите всі дані, але вносити й змінювати їх не можна.';const v=$('view');if(v&&v.parentNode)v.parentNode.insertBefore(d,v)}}catch(e){}}
   if(db&&location.hash==='#import')setTimeout(bfImportUI,800);
   if(!db){$('view').innerHTML='<div class="panel empty">Спільне сховище недоступне в цьому перегляді. Увійдіть у claude.ai, щоб бачити й вносити дані.</div>';return}
   const cfgApply=d=>{S.cfg=JSON.parse(JSON.stringify(d));S.cfgState='ok';fillBranches();const a=document.activeElement;if(a&&$('view').contains(a)&&a.tagName==='INPUT')return;render()};
