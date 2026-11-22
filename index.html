@@ -5349,7 +5349,7 @@ try{matchMedia('(max-width:760px)').addEventListener('change',placeSvc)}catch(e)
     b.onclick=()=>{if(!b.dataset.sure){b.dataset.sure=1;b.classList.add('sure');b.querySelector('.lgn').textContent='Точно вийти?';setTimeout(()=>{delete b.dataset.sure;b.classList.remove('sure');b.querySelector('.lgn').textContent='Вийти'},3000);return}logout()};sw.after(b)}}}catch(e){}placeSvc();
   const [db,user,dl]=await Promise.all([claude.use('db'),claude.use('user'),claude.use('downloads')]);S.db=db;S.user=user;S.dl=dl;claude.use('sample').then(x=>{S.sample=x}).catch(()=>{});if(db){aiLoad().then(()=>{if(S.tab==='ai')render()});setTimeout(aiWatch,1500)}
   if(user){try{S.admin=await user.canEdit();S.uid=await user.id();try{S.owner=user.isOwner?!!(await user.isOwner()):false}catch(e){}}catch(e){}}
-  if(user&&user.can){try{const cw=await user.can('data.write');S.canWrite=cw;if(cw===false){const d=document.createElement('div');d.className='rowarn';d.innerHTML='<b>У вас доступ лише на перегляд.</b> Ви бачите всі дані, але вносити й змінювати їх не можна.';const v=$('view');if(v&&v.parentNode)v.parentNode.insertBefore(d,v)}}catch(e){}}
+  if(user&&user.can){try{const cw=await user.can('data.write');S.canWrite=cw;}catch(e){}}
   if(db&&location.hash==='#import')setTimeout(bfImportUI,800);
   if(!db){$('view').innerHTML='<div class="panel empty">Спільне сховище недоступне в цьому перегляді. Увійдіть у claude.ai, щоб бачити й вносити дані.</div>';return}
   const cfgApply=d=>{S.cfg=JSON.parse(JSON.stringify(d));S.cfgState='ok';fillBranches();const a=document.activeElement;if(a&&$('view').contains(a)&&a.tagName==='INPUT')return;render()};
